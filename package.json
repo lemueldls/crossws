@@ -1,6 +1,6 @@
 {
   "name": "crossws",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Cross-platform WebSocket Servers for Node.js, Deno, Bun and Cloudflare Workers",
   "repository": "h3js/crossws",
   "homepage": "https://crossws.h3.dev",
