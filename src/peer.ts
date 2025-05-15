@@ -1,11 +1,13 @@
 import type * as web from "../types/web.ts";
 import { kNodeInspect } from "./utils.ts";
 
+export interface PeerContext extends Record<string, unknown> {}
+
 export interface AdapterInternal {
   ws: unknown;
   request: Request;
   peers?: Set<Peer>;
-  context?: Peer["context"];
+  context?: PeerContext;
 }
 
 export abstract class Peer<Internal extends AdapterInternal = AdapterInternal> {
@@ -20,7 +22,7 @@ export abstract class Peer<Internal extends AdapterInternal = AdapterInternal> {
     this._internal = internal;
   }
 
-  get context(): Record<string, unknown> {
+  get context(): PeerContext {
     return (this._internal.context ??= {});
   }
 
