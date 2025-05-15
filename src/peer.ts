@@ -117,15 +117,13 @@ export abstract class Peer<Internal extends AdapterInternal = AdapterInternal> {
     return "WebSocket";
   }
 
-  [kNodeInspect](): Record<string, unknown> {
-    return Object.fromEntries(
-      [
-        ["id", this.id],
-        ["remoteAddress", this.remoteAddress],
-        ["peers", this.peers],
-        ["webSocket", this.websocket],
-      ].filter((p) => p[1]),
-    );
+  [kNodeInspect](): unknown {
+    return {
+      peer: {
+        id: this.id,
+        ip: this.remoteAddress,
+      },
+    };
   }
 }
 

@@ -9,7 +9,7 @@ serve({
     },
 
     message(peer, message) {
-      console.log("[ws] message", peer, message);
+      console.log("[ws] message", message);
       if (message.text().includes("ping")) {
         peer.send({ user: "server", message: "pong" });
       } else {
