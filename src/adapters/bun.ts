@@ -26,6 +26,13 @@ type ContextData = {
 
 // https://bun.sh/docs/api/websockets
 const bunAdapter: Adapter<BunAdapter, BunOptions> = (options = {}) => {
+  if (typeof Bun === "undefined") {
+    // eslint-disable-next-line unicorn/prefer-type-error
+    throw new Error(
+      "[crossws] Using Bun adapter in an incompatible environment.",
+    );
+  }
+
   const hooks = new AdapterHookable(options);
   const peers = new Set<BunPeer>();
   return {

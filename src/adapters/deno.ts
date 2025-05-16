@@ -25,6 +25,13 @@ type ServeHandlerInfo = {
 // https://deno.land/api?s=Deno.upgradeWebSocket
 // https://examples.deno.land/http-server-websocket
 const denoAdapter: Adapter<DenoAdapter, DenoOptions> = (options = {}) => {
+  if (typeof Deno === "undefined") {
+    // eslint-disable-next-line unicorn/prefer-type-error
+    throw new Error(
+      "[crossws] Using Deno adapter in an incompatible environment.",
+    );
+  }
+
   const hooks = new AdapterHookable(options);
   const peers = new Set<DenoPeer>();
   return {

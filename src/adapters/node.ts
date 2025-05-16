@@ -44,6 +44,12 @@ export interface NodeOptions extends AdapterOptions {
 // https://github.com/websockets/ws
 // https://github.com/websockets/ws/blob/master/doc/ws.md
 const nodeAdapter: Adapter<NodeAdapter, NodeOptions> = (options = {}) => {
+  if ("Deno" in globalThis || "Bun" in globalThis) {
+    throw new Error(
+      "[crossws] Using Node.js adapter in an incompatible environment.",
+    );
+  }
+
   const hooks = new AdapterHookable(options);
   const peers = new Set<NodePeer>();
 
