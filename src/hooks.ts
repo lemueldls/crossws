@@ -129,8 +129,8 @@ export interface Hooks {
       readonly context?: Record<string, unknown>;
     },
   ) => MaybePromise<
+    | { headers?: HeadersInit; namespace?: string; context?: PeerContext }
     | Response
-    | (ResponseInit & { namespace?: string; context?: PeerContext })
     | void
   >;
 
