@@ -44,10 +44,14 @@ export class AdapterHookable {
   async upgrade(
     request: Request & { readonly context?: PeerContext },
   ): Promise<{
+    context: PeerContext;
+    namespace: string;
     upgradeHeaders?: HeadersInit;
     endResponse?: Response;
-    context: PeerContext;
   }> {
+    let namespace =
+      this.options.getNamespace?.(request) ?? new URL(request.url).pathname;
+
     let context = request.context;
     if (!context) {
       context = {};
@@ -63,14 +67,18 @@ export class AdapterHookable {
         request as Request & { context?: PeerContext },
       );
       if (!res) {
-        return { context };
+        return { context, namespace };
+      }
+      if ((res as { namespace?: string }).namespace) {
+        namespace = (res as { namespace: string }).namespace;
       }
       if ((res as Response).ok === false) {
-        return { context, endResponse: res as Response };
+        return { context, namespace, endResponse: res as Response };
       }
       if (res.headers) {
         return {
           context,
+          namespace,
           upgradeHeaders: res.headers,
         };
       }
@@ -79,12 +87,13 @@ export class AdapterHookable {
       if (errResponse instanceof Response) {
         return {
           context,
+          namespace,
           endResponse: errResponse,
         };
       }
       throw error;
     }
-    return { context };
+    return { context, namespace };
   }
 }
 
@@ -107,6 +116,11 @@ export type UpgradeError = Response | { readonly response: Response };
 export interface Hooks {
   /**
    * Upgrading a request to a WebSocket connection.
+   *
+   * - You can throw a Response to abort the upgrade.
+   * - You can return { headers } to modify the response.
+   * - You can return { namespace } to change the pub/sub namespace.
+   *
    * @param request
    * @throws {Response}
    */
@@ -114,7 +128,7 @@ export interface Hooks {
     request: Request & {
       readonly context?: PeerContext;
     },
-  ) => MaybePromise<Response | ResponseInit | void>;
+  ) => MaybePromise<Response | (ResponseInit & { namespace?: string }) | void>;
 
   /** A message is received */
   message: (peer: Peer, message: Message) => MaybePromise<void>;
