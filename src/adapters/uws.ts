@@ -131,7 +131,7 @@ const uwsAdapter: Adapter<UWSAdapter, UWSOptions> = (options = {}) => {
               namespace,
             } satisfies UserData,
             key,
-            protocol,
+            "",
             extensions,
             uwsContext,
           );
