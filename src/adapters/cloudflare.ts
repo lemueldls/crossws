@@ -309,7 +309,9 @@ class CloudflareFallbackPeer extends Peer<{
   }
 
   publish(_topic: string, _message: any): void {
-    // not supported
+    console.warn(
+      "[crossws] [cloudflare] pub/sub support requires Durable Objects.",
+    );
   }
 
   close(code?: number, reason?: string) {
