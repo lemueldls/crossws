@@ -16,7 +16,13 @@ export function plugin(wsOpts: WSOptions): ServerPlugin {
     // @ts-expect-error
     server.serve = () => {
       server.node?.server!.on("upgrade", (req, socket, head) => {
-        ws.handleUpgrade(req, socket, head, new NodeRequest(req));
+        ws.handleUpgrade(
+          req,
+          socket,
+          head,
+          // @ts-expect-error (upgrade is not typed)
+          new NodeRequest({ req, upgrade: { socket, head } }),
+        );
       });
       return originalServe.call(server);
     };
