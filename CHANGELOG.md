@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.4.1
+
+[compare changes](https://github.com/h3js/crossws/compare/v0.4.0...v0.4.1)
+
+### 🩹 Fixes
+
+- **node server:** Properly pass request to `NodeRequest` ([28e5d64](https://github.com/h3js/crossws/commit/28e5d64))
+
+### 🏡 Chore
+
+- **playground:** Add `start` command ([7ab898c](https://github.com/h3js/crossws/commit/7ab898c))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.4.0
 
 [compare changes](https://github.com/h3js/crossws/compare/v0.3.5...v0.4.0)
