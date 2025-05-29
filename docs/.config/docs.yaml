@@ -12,11 +12,15 @@ landing:
       icon: i-heroicons-play
       to: https://stackblitz.com/github/h3js/crossws/tree/main/playground?file=index.mjs
   features:
-    - title: 🧩 Pluggable
+    - title: Pluggable
+      icon: 🧩
       description: Seamlessly integrates with [Bun](https://crossws.h3.dev/adapters/bun), [Cloudflare Workers](https://crossws.h3.dev/adapters/cloudflare), [Deno](https://crossws.h3.dev/adapters/deno) and [Node.js](https://crossws.h3.dev/adapters/node) and any compatible web framework.
-    - title: 📦 Lightweight
+    - title: Lightweight
+      icon: 📦
       description: Extremely lightweight and tree-shakable conditional ESM exports. Prebundled with [ws](https://github.com/websockets/ws) for Node.js support.
-    - title: 🚀 Made for Performance
+    - title: Made for Performance
+      icon: 🚀
       description: High-performance and simple hooks API, without per-connection callback creation.
-    - title: 🌟 Developer Friendly
+    - title: Developer Friendly
+      icon: 🌟
       description: Typed hooks API and developer-friendly object inspection.
