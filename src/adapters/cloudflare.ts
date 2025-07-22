@@ -145,9 +145,8 @@ const cloudflareAdapter: Adapter<
       // placeholder
     },
     handleDurableUpgrade: async (obj, request) => {
-      const { upgradeHeaders, endResponse, namespace } = await hooks.upgrade(
-        request as Request,
-      );
+      const { upgradeHeaders, endResponse, context, namespace } =
+        await hooks.upgrade(request as Request);
       if (endResponse) {
         return endResponse;
       }
@@ -165,6 +164,17 @@ const cloudflareAdapter: Adapter<
       );
       peers.add(peer);
       (obj as DurableObjectPub).ctx.acceptWebSocket(server);
+
+      await (obj as DurableObjectPub).ctx.storage.put(
+        `_context:${peer.id}`,
+        context,
+      );
+
+      await (obj as DurableObjectPub).ctx.storage.put(
+        `_namespace:${peer.id}`,
+        namespace,
+      );
+
       await hooks.callHook("open", peer);
 
       // eslint-disable-next-line unicorn/no-null
@@ -176,14 +186,19 @@ const cloudflareAdapter: Adapter<
     },
     handleDurableMessage: async (obj, ws, message) => {
       const peer = CloudflareDurablePeer._restore(obj, ws as CF.WebSocket);
+      await peer._loadStorage();
       await hooks.callHook("message", peer, new Message(message, peer));
     },
     handleDurableClose: async (obj, ws, code, reason, wasClean) => {
       const peer = CloudflareDurablePeer._restore(obj, ws as CF.WebSocket);
+      await peer._loadStorage();
       const peers = getPeers(globalPeers, peer.namespace);
       peers.delete(peer);
       const details = { code, reason, wasClean };
       await hooks.callHook("close", peer, details);
+
+      await (obj as DurableObjectPub).ctx.storage.deleteAlarm();
+      await (obj as DurableObjectPub).ctx.storage.deleteAll();
     },
     handleDurablePublish: async (_obj, topic, data, opts) => {
       return durablePublish(topic, data, opts);
@@ -213,8 +228,9 @@ class CloudflareDurablePeer extends Peer<{
   ws: AugmentedWebSocket;
   request: Request;
   peers?: never;
-  durable: DurableObjectPub;
   namespace: string;
+  context?: PeerContext;
+  durable: DurableObjectPub;
 }> {
   override get peers() {
     return new Set(
@@ -226,6 +242,18 @@ class CloudflareDurablePeer extends Peer<{
 
   #getwebsockets() {
     return this._internal.durable.ctx.getWebSockets() as unknown as (typeof this._internal.ws)[];
+  }
+
+  async _loadStorage() {
+    const context = await this._internal.durable.ctx.storage.get<PeerContext>(
+      `_context:${this.id}`,
+    );
+    if (context) this._internal.context = context;
+
+    const namespace = await this._internal.durable.ctx.storage.get<string>(
+      `_namespace:${this.id}`,
+    );
+    if (namespace) this._internal.namespace = namespace;
   }
 
   send(data: unknown) {
@@ -288,6 +316,7 @@ class CloudflareDurablePeer extends Peer<{
       state.u = request.url;
     }
     state.i = peer.id;
+    state.n = peer.namespace;
     setAttachedState(ws, state);
     return peer;
   }
